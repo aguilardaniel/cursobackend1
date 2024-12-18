@@ -1,0 +1,98 @@
+[
+     {
+          "title": "Martillo",
+          "description": "Herramienta",
+          "price": "5000",
+          "thumbnail": "martillo.png",
+          "code": "A0001",
+          "stock": "15",
+          "id": 0
+     },
+     {
+          "title": "Tornillo3",
+          "description": "Pieza",
+          "price": "30",
+          "thumbnail": "tornillo3.png",
+          "code": "A0004",
+          "stock": "3000000",
+          "id": 2
+     },
+     {
+          "id": 3,
+          "title": "Producto1",
+          "description": "lalala",
+          "code": "A235",
+          "price": "597",
+          "status": "false",
+          "stock": "1000",
+          "category": "productos",
+          "thumbnail": "[]"
+     },
+     {
+          "id": 4,
+          "title": "Producto2",
+          "description": "lalala",
+          "code": "A237",
+          "price": "597",
+          "status": "false",
+          "stock": "1000",
+          "category": "productos",
+          "thumbnail": "[]"
+     },
+     {
+          "id": 5,
+          "title": "Producto10",
+          "description": "lalala",
+          "code": "A245",
+          "price": 597,
+          "status": true,
+          "stock": 1000,
+          "category": "productos"
+     },
+     {
+          "id": 6,
+          "title": "Producto5",
+          "description": "lalala",
+          "code": "A240",
+          "price": 597,
+          "status": false,
+          "stock": 1000,
+          "category": "productos"
+     },
+     {
+          "id": 7,
+          "title": "Producto6",
+          "description": "lalala",
+          "code": "A241",
+          "price": 597,
+          "status": false,
+          "stock": 1000,
+          "category": "productos",
+          "thumbnail": "lalala"
+     },
+     {
+          "id": 8,
+          "title": "Producto7",
+          "description": "lalala",
+          "code": "A242",
+          "price": 597,
+          "status": false,
+          "stock": 1000,
+          "category": "productos",
+          "thumbnail": "lalala"
+     },
+     {
+          "id": 10,
+          "title": "Producto13",
+          "description": "lalala",
+          "code": "A247",
+          "price": 597,
+          "status": false,
+          "stock": 1000,
+          "category": "productos",
+          "thumbnail": [
+               "img/producto11.png",
+               "img/producto11-1.png"
+          ]
+     }
+]
