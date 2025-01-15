@@ -2,7 +2,7 @@
   "name": "backend1",
   "version": "1.0.0",
   "type": "module",
-  "main": "productmanager1.js",  
+  "main": "productmanager1.js",
   "scripts": {
     "start": "node ./src/app.js",
     "dev": "node --watch ./src/app.js",
@@ -13,6 +13,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "express-handlebars": "^8.0.1",
+    "socket.io": "^4.8.1"
   }
 }

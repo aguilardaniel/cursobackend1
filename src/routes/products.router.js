@@ -2,6 +2,8 @@ import {Router} from "express"
 import { ProductManager } from "../dao/productmanager.js";
 import { procesaErrores } from "../utils.js";
 
+const prueba="texto de prueba"
+
 
 
 export const router=Router()
@@ -106,6 +108,15 @@ const productManager = new ProductManager();
     
             let nuevoProducto=await productManager.addProduct(title, description,code, price, status, stock, category, thumbnail)   // ... son aquí op. spread
             
+
+           // socket.on("nuevoProducto", (producto) => {
+                // Emitir a todos los clientes que un nuevo producto ha sido añadido
+                //console.log(".......")
+                let productos=await productManager.getProducts()
+                req.socket.emit("actualizarProductos", productos)
+                
+
+
             res.setHeader('Content-Type','application/json');
             return res.status(201).json({payload:`Producto Creado!`, nuevoProducto});
         } catch (error) {
@@ -151,6 +162,9 @@ const productManager = new ProductManager();
     
     
             let productoModificado=await productManager.modifyProduct(pid, aModificar)
+
+            
+                req.socket.emit("actualizarProductos", productos)
             
             res.setHeader('Content-Type','application/json');
             return res.status(200).json({payload:`Se modifico producto con id ${pid}`, productoModificado});
@@ -182,6 +196,9 @@ const productManager = new ProductManager();
     
             let productoBorrado=await productManager.deleteProduct(pid)
             
+            let productos=await productManager.getProducts()
+            req.socket.emit("actualizarProductos", productos)
+
             res.setHeader('Content-Type','application/json');
             return res.status(200).json({payload:`Se eliminó el producto con id ${pid}`, productoBorrado});
         } catch (error) {

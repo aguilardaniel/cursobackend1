@@ -1,0 +1,18 @@
+<h2>Web Socket View</h2>
+<hr>
+<!--
+<ul>
+    {{#each productos}}
+    <li>
+       <strong>{{title}}:</strong> ${{price}}
+    </li>
+    {{/each}}
+</ul>
+-->
+
+{{>listado}}
+ 
+
+<!-- Estas scripts van a lo ultimo porque esttán al final del body en esta vista-->
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/index.js"></script>
