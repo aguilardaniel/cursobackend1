@@ -3,7 +3,8 @@
 const socket=io() //inicializa socket.io
 
 socket.on("actualizarProductos", async(productos) => {
-
+  console.log("lalala")
+/*
     //ArrayProductos = JSON.parse(productos);
     const listaProductos = document.getElementById("lista");
   
@@ -19,4 +20,8 @@ socket.on("actualizarProductos", async(productos) => {
 
     //console.log(`Alguien Está por actualizar`);
     //console.log(productos);
+
+
+  */  
 });
+

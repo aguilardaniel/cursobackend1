@@ -66,13 +66,13 @@ export class CartManager{
     }
 
 
-    async modifyCart(cid, quantity ,pid){
-
+    async modifyCart(cid,aModificar={}){
+/*
         let productoParaAgregar=[{
             producto: pid,
             quantity: quantity,
         }]
-
+*/
         this.#carts=await this.getCarts()
         let indiceCarrito=this.#carts.findIndex(p=>p.id===cid)
         if(indiceCarrito==-1){
@@ -80,12 +80,19 @@ export class CartManager{
         }
 
 
-        this.#carts[indiceCarrito].products={
-            ...this.#carts[indiceCarrito].products,
-            ...productoParaAgregar,  
+
+        this.#carts[indiceCarrito]={
+            ...this.#carts[indiceCarrito],
+            ...aModificar
             //id: cid
         }
-
+/*
+        this.#carts[indiceCarrito].products={
+            ...this.#carts[indiceCarrito].products,
+            ...aModificar,  
+            //id: cid
+        }
+*/
         await fs.promises.writeFile(this.#path,JSON.stringify(this.#carts, null, 5))
         return this.#carts[indiceCarrito]
 

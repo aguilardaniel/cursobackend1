@@ -1,13 +1,16 @@
 import {Router} from "express"
-import { CartManager } from "../dao/cartmanager.js";
+import { CartManagerMongo as CartManager } from "../dao/cartmanagermongo.js";
 import { procesaErrores } from "../utils.js";
-
+import { ProductManagerMongo as ProductManager} from "../dao/productmanagermongo.js";
+import { isValidObjectId } from 'mongoose';
+import mongoose from "mongoose"; 
 
 
 export const router=Router()
 
 
 const cartManager = new CartManager();
+const productManager = new ProductManager();
 
     router.get("/", async(req, res)=>{
     //app.get("/", async(req, res)=>{
@@ -30,12 +33,19 @@ const cartManager = new CartManager();
         //app.get("/:id", async(req, res)=>{
         
             let {cid} =req.params
+            /*
             cid=Number(cid)
             if(isNaN(cid)){
                 res.setHeader('Content-Type','application/json');
                 return res.status(400).json({error:`Se requiere un id numérico`})
             }
-        
+        */
+
+            if(!isValidObjectId(cid)){
+                res.setHeader('Content-Type','application/json');
+                return res.status(400).json({error:`Se requiere un id de mongodb válido`})
+            }
+
             try {
                 let carrito=await cartManager.getCartById(cid)
                 if(!carrito){
@@ -52,33 +62,63 @@ const cartManager = new CartManager();
         })
         
   
-        router.post("/:cid/:product/:pid", async(req, res)=>{
+        router.post("/:cid/product/:pid", async(req, res)=>{
             //app.post("/", async(req, res)=>{
             
-                let {cid, product, pid} =req.params
-                
+                let {cid, pid} =req.params
+
+                if(!isValidObjectId(cid)){
+                    res.setHeader('Content-Type','application/json');
+                    return res.status(400).json({error:`El id de carrito debe ser un id de mongodb válido`})
+                }
+
+                if(!isValidObjectId(pid)){
+                    res.setHeader('Content-Type','application/json');
+                    return res.status(400).json({error:`El id delproducto debe ser un id de mongodb válido`})
+                }
+                /*
                 cid=Number(cid)
                 if(isNaN(cid)){
                     res.setHeader('Content-Type','application/json');
                     return res.status(400).json({error:`El id de carrito debe ser numérico`})
                 }
-
-                product=Number(product)
-                if(isNaN(product)){
-                    res.setHeader('Content-Type','application/json');
-                    return res.status(400).json({error:`La cantidad del producto a agregar debe ser numérica`})
-                }
-
+                */
+                
+                
+                /*
                 pid=Number(pid)
                 if(isNaN(pid)){
                     res.setHeader('Content-Type','application/json');
                     return res.status(400).json({error:`El id delproducto debe ser numérico`})
                 }
-
+                */
 
                 try {
                     // verificar tipo de datos acá también??
-                    let carrito=await cartManager.getCarts()
+                    let carrito=await cartManager.getCartById(cid)
+                    let producto= await productManager.getProductById(pid)
+
+                    if(!carrito || !producto){
+                        res.setHeader('Content-Type','application/json');
+                        return res.status(400).json({error:`Error con el carrito o el producto`})
+                    }
+
+                    //let pidObjectId = new mongoose.Types.ObjectId(pid).toString();
+                    //console.log(pidObjectId)
+                    //let posicionDeProductoEnCarrito=carrito.products.findIndex(p=>p.product._id.toString() == pidObjectId)
+            
+            
+                    let posicionDeProductoEnCarrito=carrito.products.findIndex(p=>p.product._id == pid)
+                    
+                    //let posicionDeProductoEnCarrito=carrito.products.findIndex(p=>p.product==pid)
+                        if(posicionDeProductoEnCarrito==-1){
+                            carrito.products.push({
+                                product: pid,
+                                quantity: 1
+                            })
+                        }else{
+                            carrito.products[posicionDeProductoEnCarrito].quantity++
+                    }
             /*
                     if(aModificar.title){
                         let existeTitle=productos.find(p=>p.title.toLowerCase()===aModificar.title.trim().toLowerCase() && p.id!=pid)
@@ -96,8 +136,13 @@ const cartManager = new CartManager();
                         }
                     }
             */
-            
-                    let carritoModificado=await cartManager.modifyCart(cid, product, pid)
+                    
+             
+
+
+
+
+                    let carritoModificado=await cartManager.modifyCart(cid, carrito)
                     
                     res.setHeader('Content-Type','application/json');
                     return res.status(200).json({payload:`Se modifico producto con id ${pid}`, carritoModificado});
@@ -119,51 +164,38 @@ const cartManager = new CartManager();
                 res.setHeader('Content-Type','application/json');
                 return res.status(400).json({error:`Debe ingresar datos al carrito`})
             }
-        
-         /*
-            if(typeof title!=="string" || 
-                typeof description!=="string" || 
-                typeof code!=="string" || 
-                typeof price!=="number" || 
-                typeof status!=="boolean" || 
-                typeof stock!=="number" || 
-                typeof category!=="string")
-                {
-                res.setHeader('Content-Type','application/json');
-                return res.status(400).json({error:`error en los tipos de datos enviados`})
-            }
-       
-            if(thumbnail){
-                if(!Array.isArray(stock) || thumbnail.every(item => typeof item == 'string')){
-        
-                    res.setHeader('Content-Type','application/json');
-                    return res.status(400).json({error:`El thumbnail debe ser un array de elementos tipo string`})
-                    
-                }
-            }
-            
-        */
-          
+
+
+                   
         
             
             // resto validaciones pertinentes...
             try {
+           /*
+
+                //corrobora que cada producto agregado tenga un id válido
+             carrito.products.forEach(async(elemento) => {
+
+                let idDelProducto= String(elemento.product)
+                console.log(idDelProducto)
+
         
-                
-                //validar despúes, no se debe poder repetir ni el nombre ni el código
-        /*
-                let existeSegunCode=await productManager.getProductByCode(code)
-                if(existeSegunCode){
+                if(!isValidObjectId(idDelProducto)){
                     res.setHeader('Content-Type','application/json');
-                    return res.status(400).json({error:`Ya existe el code= ${code} entre los productos`})
+                    return res.status(400).json({error:`Los id de los productos deben ser ids de mongodb válidos`})
                 }
-        
-                let existeSegunTitle=await productManager.getProductByTitle(title)
-                if(existeSegunTitle){
+
+
+                let producto= await productManager.getProductById(idDelProducto)
+                console.log(producto)
+
+                if(!producto){
                     res.setHeader('Content-Type','application/json');
-                    return res.status(400).json({error:`Ya existe el title= ${title} entre los productos`})
+                    return res.status(400).json({error:`El id de alguno de los productos no existe`})
                 }
-         */   
+
+            });
+*/
         
                 let nuevoCarrito=await cartManager.addCart(carrito)   // ... son aquí op. spread
                 
@@ -174,6 +206,114 @@ const cartManager = new CartManager();
             }
         
         })
+
+
+
+    router.delete("/:cid", async(req, res)=>{
+            //app.delete("/:id", async(req, res)=>{
+            
+                let {cid} =req.params
+                if(!isValidObjectId(cid)){
+                    res.setHeader('Content-Type','application/json');
+                    return res.status(400).json({error:`El id de carrito debe ser un id de mongodb válido`})
+                }
+                /*
+                pid=Number(pid)
+                if(isNaN(pid)){
+                    res.setHeader('Content-Type','application/json');
+                    return res.status(400).json({error:`El id debe ser numérico`})
+                }
+            */
+        
+        
+        
+                try {
+                    // verificar tipo de datos acá también??
+                    /*
+                    let productoParaBorrar=await productManager.getProductById(pid)
+            
+                    if(!productoParaBorrar){
+                        res.setHeader('Content-Type','application/json');
+                        return res.status(400).json({error:`No existe el producto con id ${pid}`})
+                        
+                    }
+            */
+                    let carritoBorrado=await cartManager.deleteCart(cid)
+                    console.log(carritoBorrado)
+        
+                    if(!carritoBorrado){
+                        res.setHeader('Content-Type','application/json');
+                        return res.status(400).json({error:`No existe el carrito con id ${cid}`})
+                        
+                    }
+                    
+        
+        
+                    res.setHeader('Content-Type','application/json');
+                    return res.status(200).json({payload:`Se eliminó el carrito con id ${cid}`, carritoBorrado});
+                } catch (error) {
+                    procesaErrores(res, error)
+                }
+            
+            })
+
+router.put("/:cid", async(req, res)=>{
+    //app.put("/:id", async(req, res)=>{
+        let {cid} =req.params
+       
+        if(!isValidObjectId(cid)){
+            res.setHeader('Content-Type','application/json');
+            return res.status(400).json({error:`Se requiere un id de mongodb válido`})
+        }
+
+        
+   
+        let aModificar=req.body
+        
+        try {
+          
+            let carrito=await cartManager.getCartById(cid)
+                    //let producto= await productManager.getProductById(pid)
+
+                    if(!carrito){
+                        res.setHeader('Content-Type','application/json');
+                        return res.status(400).json({error:`Error con el carrito`})
+                    }
+
+                    carrito.products={
+                       
+                        ...aModificar
+                        //id: cid
+                    }
+                
+            
+                
+             
+
+
+
+
+            let carritoModificado=await cartManager.modifyCart(cid, carrito)
+
+            
+
+
+          
+            
+            res.setHeader('Content-Type','application/json');
+            return res.status(200).json({payload:`Se modifico carrito con id ${cid}`, carritoModificado});
+
+            
+
+
+            
+        
+            
+        } catch (error) {
+            procesaErrores(res, error)
+        }
+
+    })
 
 
         

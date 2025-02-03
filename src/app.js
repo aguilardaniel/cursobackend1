@@ -1,8 +1,8 @@
 import express from "express"
 import {engine} from "express-handlebars"
-import {ProductManager} from "./dao/productmanager.js"
+import { ProductManagerMongo as ProductManager} from "./dao/productmanagermongo.js"
 import {Server} from "socket.io"
-
+import { conectaDB } from './ConnDB.js';
 
 //import { initSocket } from "./socket.js";
 //import { getIO } from "./socket.js";
@@ -11,11 +11,13 @@ let serverSockets
 
 
 
+
 //quitar si la pongo en routes
 import { procesaErrores } from "./utils.js";
 import {router as productsRouter} from "./routes/products.router.js"
 import {router as cartsRouter} from "./routes/carts.router.js"
 import {router as vistasRouter} from "./routes/vistasRouter.js"
+
 
 
 const PORT = 8080
@@ -63,7 +65,7 @@ const ServerHTTP= app.listen(PORT,()=>{
 
 app.get("/", (req, res)=>{
 
-    res.setHeader('Content-Type','text/plain');
+    res.setHeader('Content-Type','text/plain');ecommerce
     res.status(200).send('Bienvenido al server');
     
 })
@@ -78,6 +80,13 @@ app.get("/", (req, res)=>{
 
 
 serverSockets=new Server(ServerHTTP)
+
+conectaDB(
+    "mongodb+srv://agdaniel89:CoderHouse@cluster0.5qo4y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    "ecommerce"
+)
+
+   
 
 /* 
 io.on("connection", (socket)=>{

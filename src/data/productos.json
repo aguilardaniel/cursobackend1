@@ -29,17 +29,6 @@
           "thumbnail": "[]"
      },
      {
-          "id": 4,
-          "title": "Producto2",
-          "description": "lalala",
-          "code": "A237",
-          "price": "597",
-          "status": "false",
-          "stock": "1000",
-          "category": "productos",
-          "thumbnail": "[]"
-     },
-     {
           "id": 5,
           "title": "Producto10",
           "description": "lalala",

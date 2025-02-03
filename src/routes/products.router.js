@@ -1,8 +1,11 @@
 import {Router} from "express"
-import { ProductManager } from "../dao/productmanager.js";
+import { ProductManagerMongo as ProductManager} from "../dao/productmanagermongo.js";
 import { procesaErrores } from "../utils.js";
+import { isValidObjectId } from 'mongoose';
+
 
 const prueba="texto de prueba"
+
 
 
 
@@ -29,12 +32,20 @@ const productManager = new ProductManager();
     //app.get("/:id", async(req, res)=>{
     
         let {pid} =req.params
+        /*
         pid=Number(pid)
         if(isNaN(pid)){
             res.setHeader('Content-Type','application/json');
             return res.status(400).json({error:`Se requiere un id numérico`})
         }
-    
+    */
+
+        if(!isValidObjectId(pid)){
+            res.setHeader('Content-Type','application/json');
+            return res.status(400).json({error:`Se requiere un id de mongodb válido`})
+        }
+
+        
         try {
             let productos=await productManager.getProductById(pid)
             if(!productos){
@@ -92,7 +103,7 @@ const productManager = new ProductManager();
     
             
             //validar despúes, no se debe poder repetir ni el nombre ni el código
-    
+    /*
             let existeSegunCode=await productManager.getProductByCode(code)
             if(existeSegunCode){
                 res.setHeader('Content-Type','application/json');
@@ -104,10 +115,10 @@ const productManager = new ProductManager();
                 res.setHeader('Content-Type','application/json');
                 return res.status(400).json({error:`Ya existe el title= ${title} entre los productos`})
             }
-        
+        */
     
             let nuevoProducto=await productManager.addProduct(title, description,code, price, status, stock, category, thumbnail)   // ... son aquí op. spread
-            
+           
 
            // socket.on("nuevoProducto", (producto) => {
                 // Emitir a todos los clientes que un nuevo producto ha sido añadido
@@ -128,28 +139,39 @@ const productManager = new ProductManager();
     router.put("/:pid", async(req, res)=>{
     //app.put("/:id", async(req, res)=>{
         let {pid} =req.params
+        /*
         pid=Number(pid)
         if(isNaN(pid)){
             res.setHeader('Content-Type','application/json');
             return res.status(400).json({error:`El id debe ser numérico`})
         }
-    
+*/
+        if(!isValidObjectId(pid)){
+            res.setHeader('Content-Type','application/json');
+            return res.status(400).json({error:`Se requiere un id de mongodb válido`})
+        }
+
+        
+   
         let aModificar=req.body
+        /*
         if(aModificar.id){
             res.setHeader('Content-Type','application/json');
             return res.status(400).json({error:`No está permitido modificar el id`})
         }
-    
+    */
         try {
+            
             // verificar tipo de datos acá también??
             let productos=await productManager.getProducts()
-    
+    /*
             if(aModificar.title){
                 let existeTitle=productos.find(p=>p.title.toLowerCase()===aModificar.title.trim().toLowerCase() && p.id!=pid)
                 if(existeTitle){
                     res.setHeader('Content-Type','application/json');
                     return res.status(400).json({error:`Ya existe un producto con title ${aModificar.title}. Tiene id ${existeTitle.id}`})
                 }
+            
             }
     
             if(aModificar.code){
@@ -160,32 +182,48 @@ const productManager = new ProductManager();
                 }
             }
     
-    
+    */
             let productoModificado=await productManager.modifyProduct(pid, aModificar)
 
-            
+
                 req.socket.emit("actualizarProductos", productos)
             
             res.setHeader('Content-Type','application/json');
             return res.status(200).json({payload:`Se modifico producto con id ${pid}`, productoModificado});
+
+            
+
+
+            
+        
+            
         } catch (error) {
             procesaErrores(res, error)
         }
-    
+
     })
     
     router.delete("/:pid", async(req, res)=>{
     //app.delete("/:id", async(req, res)=>{
     
         let {pid} =req.params
+        /*
         pid=Number(pid)
         if(isNaN(pid)){
             res.setHeader('Content-Type','application/json');
             return res.status(400).json({error:`El id debe ser numérico`})
         }
-    
+    */
+
+        if(!isValidObjectId(pid)){
+            res.setHeader('Content-Type','application/json');
+            return res.status(400).json({error:`Se requiere un id de mongodb válido`})
+        }
+
+
         try {
             // verificar tipo de datos acá también??
+            /*
             let productoParaBorrar=await productManager.getProductById(pid)
     
             if(!productoParaBorrar){
@@ -193,10 +231,17 @@ const productManager = new ProductManager();
                 return res.status(400).json({error:`No existe el producto con id ${pid}`})
                 
             }
-    
+    */
             let productoBorrado=await productManager.deleteProduct(pid)
+
+            if(!productoBorrado){
+                res.setHeader('Content-Type','application/json');
+                return res.status(400).json({error:`No existe el producto con id ${pid}`})
+                
+            }
             
             let productos=await productManager.getProducts()
+
             req.socket.emit("actualizarProductos", productos)
 
             res.setHeader('Content-Type','application/json');
